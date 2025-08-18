@@ -3,6 +3,7 @@ import os
 import requests
 from dotenv import load_dotenv
 from urllib.parse import urlparse, urlunparse
+from typing import Literal
 import datetime
 
 class KNMIDataplatform:
@@ -19,9 +20,15 @@ class KNMIDataplatform:
     # 'https://api.dataplatform.knmi.nl/edr/v1/collections/Tg1/cube?f=CoverageJSON&bbox=5.17%2C52.09%2C5.18%2C52.1&z=0&datetime=2024-07-22T04%3A10%3A00Z%2F2024-07-23T04%3A10%3A00Z&parameter-name=station-temperature' \
     # -H 'accept: application/prs.coverage+json' \
     # -H 'Authorization: .env'
-    def knmi_coll(self, t0: str, t1: str, coll) -> list:
+    def get_coll(self, t0: str, t1: str, coll: Literal['Tg1', 'Tn1', 'Tx1', 'Rd1', 'EV24', 'wins50'],) -> list:
         # data validation
         # coll in c('Tx1','Tg1','Tn1')?
+
+        if coll not in ['Tg1', 'Tn1', 'Tx1', 'Rd1', 'EV24', 'wins50']:
+            raise ValueError('Coll must be Tg1, Tn1, Tx1, Rd1, EV24 or wins50.')
+
+        if datetime.datetime.strptime(t1, "%Y-%m-%d") < datetime.datetime.strptime(t0, "%Y-%m-%d"):
+            raise Exception('t1 must be later than t0.')
 
         # split URL in its parts
         uri_segments = urlparse('https://api.dataplatform.knmi.nl/edr/v1/collections/Tg1/cube?f=CoverageJSON&bbox=5.17%2C52.09%2C5.18%2C52.1&z=0&datetime=2024-07-22T04%3A10%3A00Z%2F2024-07-23T04%3A10%3A00Z&parameter-name=station-temperature')
@@ -115,13 +122,13 @@ class KNMIDataplatform:
 
             return t0 + t1.strftime('%Y-%m-%d') + time_string
 
-        if t1 == '':
+        elif t1 == '':
             t1 = '..'
             t0 = datetime.datetime.strptime(t0, "%Y-%m-%d").date()
 
             return t0.strftime('%Y-%m-%d') + time_string + slash +  t1
-
-        t0 = datetime.datetime.strptime(t0, "%Y-%m-%d").date()
-        t1 = datetime.datetime.strptime(t1, "%Y-%m-%d").date()
+        else:
+            t0 = datetime.datetime.strptime(t0, "%Y-%m-%d").date()
+            t1 = datetime.datetime.strptime(t1, "%Y-%m-%d").date()
 
         return t0.strftime('%Y-%m-%d') + time_string + slash + t1.strftime('%Y-%m-%d') + time_string
