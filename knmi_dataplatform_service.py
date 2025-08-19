@@ -6,7 +6,7 @@ from urllib.parse import urlparse, urlunparse
 from typing import Literal
 import datetime
 
-class KNMIDataplatform:
+class KNMIDataplatformService:
 
     def __init__(self):
         load_dotenv()
@@ -61,7 +61,7 @@ class KNMIDataplatform:
         dates = response.json()['domain']['axes']['t']['values']
         temps = response.json()['ranges']['station-temperature']['values']  # $station-temperature throws error 'temperature' not found
 
-        # bind into list
+        # bind lists and transpose
         date_temp = list(zip(*(dates, temps)))
 
         return date_temp
