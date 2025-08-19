@@ -61,17 +61,50 @@ class MeetJeStadService:
         humidity = []
         supply = []
         battery = []
+        firmware_version = []
+        pm25 = []
+        pm10 = []
         for row in response.json():
             dates.append(row['timestamp'])
             ids.append(row['id'])
-            temps.append(row['temperature'])
-            longitude.append(row['longitude'])
-            latitude.append(row['latitude'])
-            humidity.append(row['humidity'])
-            supply.append(row['supply'])
-            battery.append(row['battery'])
+            if 'temps' in row:
+                temps.append(row['temps'])
+            else:
+                temps.append(None)
+            if 'longitude' in row:
+                longitude.append(row['longitude'])
+            else:
+                longitude.append(None)
+            if 'latitude' in row:
+                latitude.append(row['latitude'])
+            else:
+                latitude.append(None)
+            if 'humidity' in row:
+                humidity.append(row['humidity'])
+            else:
+                humidity.append(None)
+            if 'supply' in row:
+                supply.append(row['supply'])
+            else:
+                supply.append(None)
+            if 'battery' in row:
+                battery.append(row['battery'])
+            else:
+                battery.append(None)
+            if 'firmware_version' in row:
+                firmware_version.append(row['firmware_version'])
+            else:
+                firmware_version.append(None)
+            if 'pm2.5' in row:
+                pm25.append(row['pm2.5'])
+            else:
+                pm25.append(None)
+            if 'pm10' in row:
+                pm10.append(row['pm10'])
+            else:
+                pm10.append(None)
 
         # bind lists and transpose
-        date_ids_temp = list(zip(*(dates, ids, temps, longitude, latitude, humidity, supply, battery)))
+        dates_list = list(zip(*(dates, ids, temps, longitude, latitude, humidity, supply, battery, firmware_version, pm25, pm10)))
 
-        return date_ids_temp
+        return dates_list
