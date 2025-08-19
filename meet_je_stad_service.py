@@ -45,6 +45,13 @@ class MeetJeStadService:
         if response.status_code != 200:
             raise Exception(response.reason)
 
+        if format == 'csv':
+            file = open("output/out.csv", "wb")
+            file.write(response.content)
+            file.close()
+
+            return []
+
         # read from JSON
         dates = []
         ids = []
