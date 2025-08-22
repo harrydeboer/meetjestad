@@ -76,7 +76,7 @@ class KNMIDataplatformService:
         date_temp = list(zip(*(dates, temps)))
 
         if format == 'csv':
-            with open('output/out.csv', 'w') as my_file:
+            with open('output/knmi/out.csv', 'w') as my_file:
                 wr = csv.writer(my_file, quoting=csv.QUOTE_ALL)
                 for row in date_temp:
                     wr.writerow(row)

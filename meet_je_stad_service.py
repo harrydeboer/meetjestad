@@ -53,19 +53,12 @@ class MeetJeStadService:
                         raise Exception('Invalid IDs')
 
         uri = 'https://meetjestad.net/data/?type='
-        uri += type + '&ids=' + ids + '&begin=' + date_begin.strftime('%Y-%m-%d,%H:%M') + '&end=' + date_end.strftime('%Y-%m-%d,%H:%M') + '&format=' + format + '&limit=' + str(limit)
+        uri += type + '&ids=' + ids + '&begin=' + date_begin.strftime('%Y-%m-%d,%H:%M') + '&end=' + date_end.strftime('%Y-%m-%d,%H:%M') + '&format=' + 'json' + '&limit=' + str(limit)
 
         response = requests.get(uri)
 
         if response.status_code != 200:
             raise Exception(response.reason)
-
-        if format == 'csv':
-            file = open("output/out.csv", "wb")
-            file.write(response.content)
-            file.close()
-
-            return []
 
         # read from JSON
         dates = []
@@ -124,7 +117,14 @@ class MeetJeStadService:
 
         dates_list = self._sanitize(dates_list)
 
-        return dates_list
+        if format == 'csv':
+            file = open("output/meetjestad/out.csv", "w")
+            csv.writer(file).writerows(dates_list)
+            file.close()
+
+            return []
+        else:
+            return dates_list
 
     def _sanitize(self, list: list) -> list:
 
