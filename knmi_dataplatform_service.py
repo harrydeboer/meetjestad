@@ -5,6 +5,8 @@ from dotenv import load_dotenv
 from urllib.parse import urlparse, urlunparse
 from typing import Literal
 import datetime
+import csv
+
 
 class KNMIDataplatformService:
 
@@ -20,7 +22,7 @@ class KNMIDataplatformService:
     # 'https://api.dataplatform.knmi.nl/edr/v1/collections/Tg1/cube?f=CoverageJSON&bbox=5.17%2C52.09%2C5.18%2C52.1&z=0&datetime=2024-07-22T04%3A10%3A00Z%2F2024-07-23T04%3A10%3A00Z&parameter-name=station-temperature' \
     # -H 'accept: application/prs.coverage+json' \
     # -H 'Authorization: .env'
-    def get_coll(self, t0: str, t1: str, coll: Literal['Tg1', 'Tn1', 'Tx1', 'Rd1', 'EV24', 'wins50']) -> list:
+    def get_coll(self, t0: str, t1: str, coll: Literal['Tg1', 'Tn1', 'Tx1', 'Rd1', 'EV24', 'wins50'], format: Literal['csv', 'json']) -> list:
         # data validation
         # coll in c('Tx1','Tg1','Tn1')?
         # Tx1 max
@@ -29,6 +31,9 @@ class KNMIDataplatformService:
         # Rd1 precipitation
         # EV24 evaporation
         # wins50 wind
+
+        if format not in ['csv', 'json']:
+            raise Exception('Format must be csv or json.')
 
         if coll not in ['Tg1', 'Tn1', 'Tx1', 'Rd1', 'EV24', 'wins50']:
             raise ValueError('Coll must be Tg1, Tn1, Tx1, Rd1, EV24 or wins50.')
@@ -70,7 +75,16 @@ class KNMIDataplatformService:
         # bind lists and transpose
         date_temp = list(zip(*(dates, temps)))
 
-        return date_temp
+        if format == 'csv':
+            with open('output/out.csv', 'w') as my_file:
+                wr = csv.writer(my_file, quoting=csv.QUOTE_ALL)
+                for row in date_temp:
+                    wr.writerow(row)
+
+            return []
+        else:
+
+            return date_temp
 
     # Request observation data (non-validated, one value every 10') from KNMI data platform
     # sample URL

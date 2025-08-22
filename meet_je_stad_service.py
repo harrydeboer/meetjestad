@@ -1,6 +1,7 @@
 import requests
 from typing import Literal
 import datetime
+import csv
 
 
 class MeetJeStadService:
@@ -16,7 +17,7 @@ class MeetJeStadService:
 
         date_begin = datetime.datetime.strptime(begin, "%Y-%m-%d,%H:%M")
         date_end = datetime.datetime.strptime(end, "%Y-%m-%d,%H:%M")
-        if date_end  < date_begin:
+        if date_end < date_begin:
             raise Exception('t1 must be later than t0.')
 
         if type not in ['sensors', 'flora', 'stories']:
@@ -26,16 +27,30 @@ class MeetJeStadService:
             raise Exception('Format must be csv or json.')
 
         if ids == 'Utrecht':
-            ids = '1'
-
-        for id in ids.split(','):
-            if len(id.split('-')) > 1:
-                for id_underscore in id.split('-'):
-                    if not id_underscore.isdigit():
+            ids = ''
+            with open('Administratie stations tbv Mailchimp.csv') as csvfile:
+                reader = csv.reader(csvfile)
+                count = 0
+                for row in reader:
+                    if count == 0:
+                        count += 1
+                        continue
+                    row = row[0].split(';')
+                    if row[3] == 'nee':
+                        continue
+                    if is_particulate_matter_only and row[2] == 'nee':
+                        continue
+                    ids += row[0] + ','
+                ids = ids[:-1]
+        else:
+            for id in ids.split(','):
+                if len(id.split('-')) > 1:
+                    for id_underscore in id.split('-'):
+                        if not id_underscore.isdigit():
+                            raise Exception('Invalid IDs')
+                else:
+                    if not id.isdigit():
                         raise Exception('Invalid IDs')
-            else:
-                if not id.isdigit():
-                    raise Exception('Invalid IDs')
 
         uri = 'https://meetjestad.net/data/?type='
         uri += type + '&ids=' + ids + '&begin=' + date_begin.strftime('%Y-%m-%d,%H:%M') + '&end=' + date_end.strftime('%Y-%m-%d,%H:%M') + '&format=' + format + '&limit=' + str(limit)
@@ -107,4 +122,23 @@ class MeetJeStadService:
         # bind lists and transpose
         dates_list = list(zip(*(dates, ids, temps, longitude, latitude, humidity, supply, battery, firmware_version, pm25, pm10)))
 
+        dates_list = self._sanitize(dates_list)
+
         return dates_list
+
+    def _sanitize(self, list: list) -> list:
+
+        result = []
+        for row in list:
+            if row[2] is not None:
+                if row[2] < -25 or row[2] > 70:
+                    continue
+            if row[9] is not None:
+                if row[9] > 2000:
+                    continue
+            if row[10] is not None:
+                if row[10] > 2000:
+                    continue
+            result += [row]
+
+        return result
