@@ -9,8 +9,8 @@ class MeetJeStadService:
     def get_data(self,
                  begin: str,
                  end: str,
-                 type: Literal['sensors', 'flora', 'stories'],
-                 format: Literal['csv', 'json'],
+                 type_api: Literal['sensors', 'flora', 'stories'],
+                 format_api: Literal['csv', 'json'],
                  ids: str = 'Utrecht',
                  is_particulate_matter_only: bool = False,
                  limit: int = 100) -> list:
@@ -20,20 +20,18 @@ class MeetJeStadService:
         if date_end < date_begin:
             raise Exception('t1 must be later than t0.')
 
-        if type not in ['sensors', 'flora', 'stories']:
+        if type_api not in ['sensors', 'flora', 'stories']:
             raise Exception('type must be sensors, flora or stories.')
 
-        if format not in ['csv', 'json']:
+        if format_api not in ['csv', 'json']:
             raise Exception('Format must be csv or json.')
 
         if ids == 'Utrecht':
             ids = ''
             with open('Administratie stations tbv Mailchimp.csv') as csvfile:
                 reader = csv.reader(csvfile)
-                count = 0
-                for row in reader:
-                    if count == 0:
-                        count += 1
+                for index, row in enumerate(reader):
+                    if index == 0:
                         continue
                     row = row[0].split(';')
                     if row[3] == 'nee':
@@ -43,17 +41,18 @@ class MeetJeStadService:
                     ids += row[0] + ','
                 ids = ids[:-1]
         else:
-            for id in ids.split(','):
-                if len(id.split('-')) > 1:
-                    for id_underscore in id.split('-'):
+            for id_sensor in ids.split(','):
+                if len(id_sensor.split('-')) > 1:
+                    for id_underscore in id_sensor.split('-'):
                         if not id_underscore.isdigit():
                             raise Exception('Invalid IDs')
                 else:
-                    if not id.isdigit():
+                    if not id_sensor.isdigit():
                         raise Exception('Invalid IDs')
 
         uri = 'https://meetjestad.net/data/?type='
-        uri += type + '&ids=' + ids + '&begin=' + date_begin.strftime('%Y-%m-%d,%H:%M') + '&end=' + date_end.strftime('%Y-%m-%d,%H:%M') + '&format=' + 'json' + '&limit=' + str(limit)
+        uri += (type_api + '&ids=' + ids + '&begin=' + date_begin.strftime('%Y-%m-%d,%H:%M') + '&end=' +
+                date_end.strftime('%Y-%m-%d,%H:%M') + '&format=json&limit=' + str(limit))
 
         response = requests.get(uri)
 
@@ -113,11 +112,12 @@ class MeetJeStadService:
                 pm10.append(None)
 
         # bind lists and transpose
-        dates_list = list(zip(*(dates, ids, temps, longitude, latitude, humidity, supply, battery, firmware_version, pm25, pm10)))
+        dates_list = list(zip(*(dates, ids, temps, longitude, latitude, humidity,
+                                supply, battery, firmware_version, pm25, pm10)))
 
         dates_list = self._sanitize(dates_list)
 
-        if format == 'csv':
+        if format_api == 'csv':
             file = open("output/meetjestad/out.csv", "w")
             csv.writer(file).writerows(dates_list)
             file.close()
@@ -126,10 +126,10 @@ class MeetJeStadService:
         else:
             return dates_list
 
-    def _sanitize(self, list: list) -> list:
+    def _sanitize(self, dates_list: list) -> list:
 
         result = []
-        for row in list:
+        for row in dates_list:
             if row[2] is not None:
                 if row[2] < -25 or row[2] > 70:
                     continue

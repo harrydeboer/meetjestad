@@ -2,7 +2,6 @@
 import os
 import requests
 from dotenv import load_dotenv
-from urllib.parse import urlparse, urlunparse
 from typing import Literal
 import datetime
 import csv
@@ -17,12 +16,14 @@ class KNMIDataplatformService:
 
     # Request collection data (validated data, one value per day) from KNMI data platform
     # sample curl
-    # in case of collection there's both the collection (Tg1/Tn1/Tx1/Rd1/EV24/wins50) and the parameter (temperature,station-temperature,station-number)
+    # in case of collection there's both the collection (Tg1/Tn1/Tx1/Rd1/EV24/wins50) and the
+    # parameter (temperature,station-temperature,station-number)
     # curl -X 'GET' \
-    # 'https://api.dataplatform.knmi.nl/edr/v1/collections/Tg1/cube?f=CoverageJSON&bbox=5.17%2C52.09%2C5.18%2C52.1&z=0&datetime=2024-07-22T04%3A10%3A00Z%2F2024-07-23T04%3A10%3A00Z&parameter-name=station-temperature' \
+    # 'https://api.dataplatform.knmi.nl/edr/v1/collections/Tg1/cube?
     # -H 'accept: application/prs.coverage+json' \
     # -H 'Authorization: .env'
-    def get_coll(self, t0: str, t1: str, coll: Literal['Tg1', 'Tn1', 'Tx1', 'Rd1', 'EV24', 'wins50'], format: Literal['csv', 'json']) -> list:
+    def get_coll(self, t0: str, t1: str, coll: Literal['Tg1', 'Tn1', 'Tx1', 'Rd1', 'EV24', 'wins50'],
+                 format_api: Literal['csv', 'json']) -> list:
         # data validation
         # coll in c('Tx1','Tg1','Tn1')?
         # Tx1 max
@@ -32,7 +33,7 @@ class KNMIDataplatformService:
         # EV24 evaporation
         # wins50 wind
 
-        if format not in ['csv', 'json']:
+        if format_api not in ['csv', 'json']:
             raise Exception('Format must be csv or json.')
 
         if coll not in ['Tg1', 'Tn1', 'Tx1', 'Rd1', 'EV24', 'wins50']:
@@ -42,26 +43,9 @@ class KNMIDataplatformService:
             raise Exception('t1 must be later than t0.')
 
         # split URL in its parts
-        uri_segments = urlparse('https://api.dataplatform.knmi.nl/edr/v1/collections/Tg1/cube?f=CoverageJSON&bbox=5.17%2C52.09%2C5.18%2C52.1&z=0&datetime=2024-07-22T04%3A10%3A00Z%2F2024-07-23T04%3A10%3A00Z&parameter-name=station-temperature')
-
-        # merge collection into path
-        uri_path = uri_segments.path.split('/')  # split path into list
-        uri_path[4] = coll
-        uri_path = '/'.join(uri_path)
-
-        uri_segments = uri_segments._replace(path=uri_path)
-
-        # set datetime in query string to start & end
-        queries = uri_segments.query.split("&")
-        query = ''
-        for query_string in queries:
-            if query_string.startswith('datetime='):
-                query_string = 'datetime=' + self._to_interval(t0, t1)
-            query += query_string + '&'
-        uri_segments = uri_segments._replace(query=query[:-1])
-
-        # Use urlunparse() to build URL
-        uri = urlunparse(uri_segments)
+        uri = 'https://api.dataplatform.knmi.nl/edr/v1/collections/' + coll + '/cube?f=CoverageJSON'
+        uri += '&bbox=5.17%2C52.09%2C5.18%2C52.1&z=0'
+        uri += '&datetime=' + self._to_interval(t0, t1) + '&parameter-name=station-temperature'
 
         response = requests.get(uri, headers={"Authorization": self.api_key})
 
@@ -70,12 +54,12 @@ class KNMIDataplatformService:
 
         # read dates and temperatures from JSON
         dates = response.json()['domain']['axes']['t']['values']
-        temps = response.json()['ranges']['station-temperature']['values']  # $station-temperature throws error 'temperature' not found
+        temps = response.json()['ranges']['station-temperature']['values']
 
         # bind lists and transpose
         date_temp = list(zip(*(dates, temps)))
 
-        if format == 'csv':
+        if format_api == 'csv':
             with open('output/knmi/out.csv', 'w') as my_file:
                 wr = csv.writer(my_file, quoting=csv.QUOTE_ALL)
                 for row in date_temp:
@@ -86,46 +70,7 @@ class KNMIDataplatformService:
 
             return date_temp
 
-    # Request observation data (non-validated, one value every 10') from KNMI data platform
-    # sample URL
-    # https://api.dataplatform.knmi.nl/edr/v1/collections/observations/cube?f=CoverageJSON&bbox=5.17%2C52.09%2C5.18%2C52.1&z=0&datetime=2025-01-22T04%3A10%3A00Z%2F..&parameter-name=sq_10
-    # def knmi_obs(self,t0: str,t1: str, param, daily: bool = False) -> list:
-    #     # validate data
-    #
-    #     # split URL in its parts
-    #     uri_segments = urlparse('https://api.dataplatform.knmi.nl/edr/v1/collections/observations/cube?f=CoverageJSON&bbox=5.17%2C52.09%2C5.18%2C52.1&z=0&datetime=2025-01-22T04%3A10%3A00Z%2F..&parameter-name=sq_10')
-    #
-    #     # set datetime in query string to start & end
-    #     queries = uri_segments.query.split("&")
-    #     query = ''
-    #     for query_string in queries:
-    #         if query_string.startswith('datetime='):
-    #             query_string = 'datetime=' + self._to_interval(t0, t1)
-    #         if query_string.startswith('parameter-name='):
-    #             query_string = 'parameter-name=' + param
-    #         query += query_string + '&'
-    #     uri_segments = uri_segments._replace(query=query[:-1])
-    #
-    #     uri = urlunparse(uri_segments)
-    #
-    #     response = requests.get(uri, headers={"Authorization": self.api_key})
-    #
-    #     if response.status_code != 200:
-    #         raise Exception(response.reason)
-
-        # # read dates and temperatures from JSON
-        # dates = response.json()['coverages'][0]['domain']['axes']['t']['values']
-        # temps = response.json()['coverages'][0]['ranges']['station-temperature']['values']  # $station-temperature throws error 'temperature' not found
-        #
-        # # bind into list
-        # date_temp = list(zip(*(dates, temps)))
-        #
-        # date_temp = list()
-        #
-        # return date_temp
-
-    @staticmethod
-    def _to_interval(t0: str, t1: str):
+    def _to_interval(self, t0: str, t1: str):
         # t0 or t1 empty - replace with '..'
         # both empty - return error
         # (%2F)
