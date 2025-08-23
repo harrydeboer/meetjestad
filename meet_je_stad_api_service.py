@@ -4,13 +4,13 @@ import datetime
 import csv
 
 
-class MeetJeStadService:
+class MeetJeStadAPIService:
 
     def get_data(self,
                  begin: str,
                  end: str,
                  type_api: Literal['sensors', 'flora', 'stories'],
-                 format_api: Literal['csv', 'json'],
+                 format_output: Literal['csv', 'json'],
                  ids: str = 'Utrecht',
                  is_particulate_matter_only: bool = False,
                  limit: int = 100) -> list:
@@ -23,7 +23,7 @@ class MeetJeStadService:
         if type_api not in ['sensors', 'flora', 'stories']:
             raise Exception('type must be sensors, flora or stories.')
 
-        if format_api not in ['csv', 'json']:
+        if format_output not in ['csv', 'json']:
             raise Exception('Format must be csv or json.')
 
         if ids == 'Utrecht':
@@ -117,7 +117,7 @@ class MeetJeStadService:
 
         dates_list = self._sanitize(dates_list)
 
-        if format_api == 'csv':
+        if format_output == 'csv':
             file = open("output/meetjestad/out.csv", "w")
             csv.writer(file).writerows(dates_list)
             file.close()

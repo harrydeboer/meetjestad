@@ -7,7 +7,7 @@ import datetime
 import csv
 
 
-class KNMIDataplatformService:
+class KNMIDataplatformAPIService:
 
     def __init__(self):
         load_dotenv()
@@ -23,7 +23,7 @@ class KNMIDataplatformService:
     # -H 'accept: application/prs.coverage+json' \
     # -H 'Authorization: .env'
     def get_coll(self, t0: str, t1: str, coll: Literal['Tg1', 'Tn1', 'Tx1', 'Rd1', 'EV24', 'wins50'],
-                 format_api: Literal['csv', 'json']) -> list:
+                 format_output: Literal['csv', 'json']) -> list:
         # data validation
         # coll in c('Tx1','Tg1','Tn1')?
         # Tx1 max
@@ -33,7 +33,7 @@ class KNMIDataplatformService:
         # EV24 evaporation
         # wins50 wind
 
-        if format_api not in ['csv', 'json']:
+        if format_output not in ['csv', 'json']:
             raise Exception('Format must be csv or json.')
 
         if coll not in ['Tg1', 'Tn1', 'Tx1', 'Rd1', 'EV24', 'wins50']:
@@ -59,7 +59,7 @@ class KNMIDataplatformService:
         # bind lists and transpose
         date_temp = list(zip(*(dates, temps)))
 
-        if format_api == 'csv':
+        if format_output == 'csv':
             with open('output/knmi/out.csv', 'w') as my_file:
                 wr = csv.writer(my_file, quoting=csv.QUOTE_ALL)
                 for row in date_temp:
