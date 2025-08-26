@@ -12,7 +12,7 @@ class KNMIDataplatformAPIService:
     def __init__(self):
         load_dotenv()
 
-        self.api_key = os.getenv('API_KEY')
+        self.api_key = os.getenv('KNMI_API_KEY')
 
     # Request collection data (validated data, one value per day) from KNMI data platform
     # sample curl
