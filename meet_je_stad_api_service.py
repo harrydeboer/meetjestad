@@ -118,7 +118,7 @@ class MeetJeStadAPIService:
         dates_list = self._sanitize(dates_list)
 
         if format_output == 'csv':
-            file = open("output/meetjestad/out.csv", "w")
+            file = open("output/meetjestad/out.csv", "w", newline='')
             csv.writer(file).writerows(dates_list)
             file.close()
 
@@ -130,15 +130,16 @@ class MeetJeStadAPIService:
 
         result = []
         for row in dates_list:
+            row_return = list(row)
             if row[2] is not None:
                 if row[2] < -25 or row[2] > 70:
-                    continue
+                    row_return[2] = None
             if row[9] is not None:
-                if row[9] > 2000:
-                    continue
+                if row[9] < 0 or row[9] > 250:
+                    row_return[9] = None
             if row[10] is not None:
-                if row[10] > 2000:
-                    continue
+                if row[10] < 0 or row[10] > 250:
+                    row_return[10] = None
             result += [row]
 
         return result

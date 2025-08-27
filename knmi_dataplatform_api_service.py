@@ -60,10 +60,10 @@ class KNMIDataplatformAPIService:
         date_temp = list(zip(*(dates, temps)))
 
         if format_output == 'csv':
-            with open('output/knmi/out.csv', 'w') as my_file:
+            with open('output/knmi/' + coll + '-' + t0 + '-' + t1  + '.csv', 'w', newline='') as my_file:
                 wr = csv.writer(my_file, quoting=csv.QUOTE_ALL)
                 for row in date_temp:
-                    wr.writerow(row)
+                    wr.writerow(list(row))
 
             return []
         else:

@@ -3,7 +3,7 @@
 /build
 /dist
 /node_modules
-
+ids
 # Environments
 .env
 .venv
