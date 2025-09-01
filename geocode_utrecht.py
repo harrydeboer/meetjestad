@@ -8,7 +8,7 @@ import csv
 lat_s = 52.03
 lat_n = 52.14
 long_w = 4.98
-long_e= 5.19
+long_e = 5.19
 
 step = 500
 load_dotenv()
