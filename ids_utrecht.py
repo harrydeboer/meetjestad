@@ -1,5 +1,6 @@
 import csv
 import datetime
+import math
 
 
 # Utrecht rectangle
@@ -17,8 +18,10 @@ with open("geocode_first.csv", newline='') as csv_file:
         for item in row[0].split(','):
             items.append(int(item.replace('"', '')))
         chart.append(items)
+    chart.reverse()
 
 last_sensor_id = 1100
+last_date = '2025-08-29'
 for id_sensor in range(1, last_sensor_id + 1):
     latitudes = {}
     longitudes = {}
@@ -62,8 +65,16 @@ for id_sensor in range(1, last_sensor_id + 1):
     for key, latitude in latitudes.items():
         longitude = longitudes[key]
         utrecht_row = [key]
-        if (long_e > longitude > long_w and lat_n > latitude > lat_s and
-                chart[int((latitude - lat_s) * 500)][int((longitude - long_w) * 500)] == 1):
+        if long_e > longitude > long_w and lat_n > latitude > lat_s:
+            north = math.ceil((latitude - lat_s) * 500)
+            south = math.floor((latitude - lat_s) * 500)
+            east = math.ceil((longitude - long_w) * 500)
+            west = math.floor((longitude - long_w) * 500)
+            chart_sw = chart[south][west]
+            chart_se = chart[south][east]
+            chart_nw = chart[north][west]
+            chart_ne = chart[north][east]
+            if chart_sw == 1 or chart_se == 1 or chart_nw == 1 or chart_ne == 1:
                 utrecht_row.append(1)
                 if not utrecht_city and start_date_utrecht == '':
                     start_date_utrecht = key
@@ -75,7 +86,12 @@ for id_sensor in range(1, last_sensor_id + 1):
             utrecht_row.append(0)
         utrecht.append(utrecht_row)
     if utrecht_city:
+        end_date = [*latitudes.keys()][-1]
+        if end_date == last_date:
+            end_date = ''
+        if end_date_utrecht == last_date:
+            end_date_utrecht = ''
         file = open("utrecht.csv", "a", newline='')
-        csv.writer(file).writerow([id_sensor, next(iter(latitudes)), [*latitudes.keys()][-1],
+        csv.writer(file).writerow([id_sensor, next(iter(latitudes)), end_date,
                                    start_date_utrecht, end_date_utrecht, particulate_matter])
         file.close()
