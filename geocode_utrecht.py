@@ -12,9 +12,8 @@ long_e = 5.19
 
 step = 500
 load_dotenv()
-jan = reversed(range(int(lat_s * step), int(lat_n * step) + 1))
 maps_api_key = os.getenv('MAPS_API_KEY')
-for latitude in reversed(range(int(long_w * step), int(long_e * step) + 1)):
+for latitude in reversed(range(int(lat_s * step), int(lat_n * step) + 1)):
     results = [0] * (int(long_e * step) - int(long_w * step) + 1)
     for longitude in range(int(long_w * step), int(long_e * step) + 1):
         response = requests.get('https://maps.googleapis.com/maps/api/geocode/json?latlng=' +

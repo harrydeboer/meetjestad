@@ -89,6 +89,8 @@ for id_sensor in range(1, last_sensor_id + 1):
         end_date = [*latitudes.keys()][-1]
         if end_date == last_date:
             end_date = ''
+        if end_date_utrecht == '' and end_date != '':
+            end_date_utrecht = [*latitudes.keys()][-1]
         if end_date_utrecht == last_date:
             end_date_utrecht = ''
         file = open("utrecht.csv", "a", newline='')
