@@ -70,6 +70,7 @@ for id_sensor in range(1, last_sensor_id + 1):
     for key, latitude in latitudes.items():
         longitude = longitudes[key]
         utrecht_row = [key]
+        end_date_utrecht = key
         if long_e > longitude > long_w and lat_n > latitude > lat_s:
             north = math.ceil((latitude - lat_s) * step)
             south = math.floor((latitude - lat_s) * step)
@@ -84,17 +85,16 @@ for id_sensor in range(1, last_sensor_id + 1):
                 if not utrecht_city and start_date_utrecht == '':
                     start_date_utrecht = key
                 utrecht_city = True
+            else:
+                utrecht_row.append(0)
+                utrecht_city = False
         else:
-            if utrecht_city:
-                end_date_utrecht = key
             utrecht_city = False
             utrecht_row.append(0)
         utrecht.append(utrecht_row)
     if utrecht_city:
         if end_date == last_date:
             end_date = ''
-        if end_date_utrecht == '' and end_date != '':
-            end_date_utrecht = [*latitudes.keys()][-1]
         if end_date_utrecht == last_date:
             end_date_utrecht = ''
         file = open("utrecht.csv", "a", newline='')
