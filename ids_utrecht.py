@@ -27,13 +27,18 @@ for id_sensor in range(1, last_sensor_id + 1):
     longitudes = {}
     utrecht = []
     particulate_matter = 0
+    start_date = ''
+    end_date = ''
     with open("ids/" + str(id_sensor) + "/out.csv", newline='') as csv_file:
         reader = csv.reader(csv_file, delimiter=',', quotechar='|')
         count_latitude = 0
         count_longitude = 0
-        for row in reader:
+        for key, row in enumerate(reader):
             date_object = datetime.datetime.strptime(row[0].replace('"', ''), "%Y-%m-%d %H:%M:%S")
             date = date_object.strftime('%Y-%m-%d')
+            end_date = date
+            if key == 0:
+                start_date = date
             latitude = row[4].replace('"', '')
             if latitude == '':
                 continue
@@ -66,10 +71,10 @@ for id_sensor in range(1, last_sensor_id + 1):
         longitude = longitudes[key]
         utrecht_row = [key]
         if long_e > longitude > long_w and lat_n > latitude > lat_s:
-            north = math.ceil((latitude - lat_s) * 500)
-            south = math.floor((latitude - lat_s) * 500)
-            east = math.ceil((longitude - long_w) * 500)
-            west = math.floor((longitude - long_w) * 500)
+            north = math.ceil((latitude - lat_s) * step)
+            south = math.floor((latitude - lat_s) * step)
+            east = math.ceil((longitude - long_w) * step)
+            west = math.floor((longitude - long_w) * step)
             chart_sw = chart[south][west]
             chart_se = chart[south][east]
             chart_nw = chart[north][west]
@@ -86,7 +91,6 @@ for id_sensor in range(1, last_sensor_id + 1):
             utrecht_row.append(0)
         utrecht.append(utrecht_row)
     if utrecht_city:
-        end_date = [*latitudes.keys()][-1]
         if end_date == last_date:
             end_date = ''
         if end_date_utrecht == '' and end_date != '':
@@ -94,6 +98,6 @@ for id_sensor in range(1, last_sensor_id + 1):
         if end_date_utrecht == last_date:
             end_date_utrecht = ''
         file = open("utrecht.csv", "a", newline='')
-        csv.writer(file).writerow([id_sensor, next(iter(latitudes)), end_date,
+        csv.writer(file).writerow([id_sensor, start_date, end_date,
                                    start_date_utrecht, end_date_utrecht, particulate_matter])
         file.close()
