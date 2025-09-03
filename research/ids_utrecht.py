@@ -1,7 +1,7 @@
 import csv
 import datetime
 import math
-
+import os
 
 # Utrecht rectangle
 lat_s = 52.03
@@ -11,7 +11,7 @@ long_e = 5.19
 
 step = 500
 chart = []
-with open("geocode_first.csv", newline='') as csv_file:
+with open(os.getcwd() + "/geocode.csv", newline='') as csv_file:
     reader = csv.reader(csv_file, delimiter=' ', quotechar='|')
     for row in reader:
         items = []
@@ -21,7 +21,7 @@ with open("geocode_first.csv", newline='') as csv_file:
     chart.reverse()
 
 last_sensor_id = 1100
-last_date = '2025-08-29'
+last_date = '2025-08-31'
 for id_sensor in range(1, last_sensor_id + 1):
     latitudes = {}
     longitudes = {}
@@ -97,7 +97,7 @@ for id_sensor in range(1, last_sensor_id + 1):
             end_date = ''
         if end_date_utrecht == last_date:
             end_date_utrecht = ''
-        file = open("utrecht.csv", "a", newline='')
+        file = open(os.getcwd() + "/utrecht.csv", "a", newline='')
         csv.writer(file).writerow([id_sensor, start_date, end_date,
                                    start_date_utrecht, end_date_utrecht, particulate_matter])
         file.close()

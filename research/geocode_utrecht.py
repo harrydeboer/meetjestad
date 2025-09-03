@@ -23,7 +23,7 @@ for latitude in reversed(range(int(lat_s * step), int(lat_n * step) + 1)):
         maps = response.json()['plus_code']['compound_code']
         if maps.split(',')[0].split(' ')[1] == 'Utrecht':
            results[longitude - int(long_e * step)] = 1
-    file = open("geocode.csv", "a", newline='')
+    file = open(os.getcwd() + "/geocode.csv", "a", newline='')
     csv.writer(file, quoting=csv.QUOTE_ALL).writerow(results)
     file.close()
 

@@ -1,3 +1,5 @@
+import os
+
 import requests
 from typing import Literal
 import datetime
@@ -13,7 +15,8 @@ class MeetJeStadAPIService:
                  format_output: Literal['csv', 'json'],
                  ids: str = 'Utrecht',
                  is_particulate_matter_only: bool = False,
-                 limit: int = 100) -> list:
+                 limit: int = 100,
+                 is_active_only: bool = True) -> list:
 
         date_begin = datetime.datetime.strptime(begin, "%Y-%m-%d,%H:%M")
         date_end = datetime.datetime.strptime(end, "%Y-%m-%d,%H:%M")
@@ -28,15 +31,14 @@ class MeetJeStadAPIService:
 
         if ids == 'Utrecht':
             ids = ''
-            with open('Administratie stations tbv Mailchimp.csv') as csvfile:
+            with open(os.path.dirname(os.path.abspath(__file__)) + '/utrecht.csv') as csvfile:
                 reader = csv.reader(csvfile)
                 for index, row in enumerate(reader):
                     if index == 0:
                         continue
-                    row = row[0].split(';')
-                    if row[3] == 'nee':
+                    if is_active_only and row[2] != '':
                         continue
-                    if is_particulate_matter_only and row[2] == 'nee':
+                    if is_particulate_matter_only and row[5] == '0':
                         continue
                     ids += row[0] + ','
                 ids = ids[:-1]
@@ -115,10 +117,13 @@ class MeetJeStadAPIService:
         dates_list = list(zip(*(dates, ids, temps, longitude, latitude, humidity,
                                 supply, battery, firmware_version, pm25, pm10)))
 
+        dates_list.reverse()
+        dates_list.sort(key=lambda x: x[1])
+
         dates_list = self._sanitize(dates_list)
 
         if format_output == 'csv':
-            file = open("output/meetjestad/out.csv", "w", newline='')
+            file = open(os.path.dirname(os.path.abspath(__file__)) + "/output/meetjestad/out.csv", "w", newline='')
             csv.writer(file).writerows(dates_list)
             file.close()
 

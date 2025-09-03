@@ -3,7 +3,7 @@
 /build
 /dist
 /node_modules
-ids
+research/ids
 # Environments
 .env
 .venv
