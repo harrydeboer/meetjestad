@@ -61,7 +61,7 @@ class KNMIDataplatformAPIService:
 
         if format_output == 'csv':
             with open(os.path.dirname(os.path.abspath(__file__)) + '/output/knmi/' + coll + '-' + t0 + '-' + t1  + '.csv', 'w', newline='') as my_file:
-                wr = csv.writer(my_file, quoting=csv.QUOTE_ALL)
+                wr = csv.writer(my_file)
                 for row in date_temp:
                     wr.writerow(list(row))
 
