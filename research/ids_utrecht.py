@@ -29,7 +29,7 @@ for id_sensor in range(1, last_sensor_id + 1):
     particulate_matter = 0
     start_date = ''
     end_date = ''
-    with open("ids/" + str(id_sensor) + "/out.csv", newline='') as csv_file:
+    with open(os.getcwd() + "/ids/" + str(id_sensor) + "/out.csv", newline='') as csv_file:
         reader = csv.reader(csv_file, delimiter=',', quotechar='|')
         count_latitude = 0
         count_longitude = 0
@@ -97,7 +97,7 @@ for id_sensor in range(1, last_sensor_id + 1):
             end_date = ''
         if end_date_utrecht == last_date:
             end_date_utrecht = ''
-        file = open(os.getcwd() + "/utrecht.csv", "a", newline='')
+        file = open(os.path.dirname(os.getcwd()) + "/utrecht.csv", "a", newline='')
         csv.writer(file).writerow([id_sensor, start_date, end_date,
                                    start_date_utrecht, end_date_utrecht, particulate_matter])
         file.close()
