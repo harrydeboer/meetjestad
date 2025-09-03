@@ -76,8 +76,8 @@ class MeetJeStadAPIService:
         for row in response.json():
             dates.append(row['timestamp'])
             ids.append(row['id'])
-            if 'temps' in row:
-                temps.append(row['temps'])
+            if 'temperature' in row:
+                temps.append(row['temperature'])
             else:
                 temps.append(None)
             if 'longitude' in row:
