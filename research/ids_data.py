@@ -30,5 +30,5 @@ for id_sensor in range(1, last_sensor_id + 1):
 
     os.makedirs(os.getcwd() + '/ids/' + str(id_sensor), exist_ok=True)
     file = open(os.getcwd() + '/ids/' + str(id_sensor) + "/out.csv", "w", newline='')
-    csv.writer(file, quoting=csv.QUOTE_ALL).writerows(results)
+    csv.writer(file,).writerows(results)
     file.close()
