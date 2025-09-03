@@ -34,17 +34,17 @@ for id_sensor in range(1, last_sensor_id + 1):
         count_latitude = 0
         count_longitude = 0
         for key, row in enumerate(reader):
-            date_object = datetime.datetime.strptime(row[0].replace('"', ''), "%Y-%m-%d %H:%M:%S")
+            date_object = datetime.datetime.strptime(row[0], "%Y-%m-%d %H:%M:%S")
             date = date_object.strftime('%Y-%m-%d')
             end_date = date
             if key == 0:
                 start_date = date
-            latitude = row[4].replace('"', '')
+            latitude = row[4]
             if latitude == '':
                 continue
             else:
                 latitude = float(latitude)
-            longitude = row[3].replace('"', '')
+            longitude = row[3]
             if longitude == '':
                 continue
             else:
@@ -62,7 +62,7 @@ for id_sensor in range(1, last_sensor_id + 1):
             else:
                 longitudes[date] = longitude
                 count_longitude = 1
-            if row[9] != '""' or row[10] != '""':
+            if row[9] != '' or row[10] != '':
                 particulate_matter = 1
     utrecht_city = False
     start_date_utrecht = ''
