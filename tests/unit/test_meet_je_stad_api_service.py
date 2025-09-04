@@ -17,4 +17,4 @@ class TestMeetJeStadAPIService(unittest.TestCase):
                                   'sensors',
                                   'json',
                                   '1085')
-        self.assertEqual(len(result[0]), 13)
+        self.assertEqual(len(result[0]), len(service.row_keys) - 1)
