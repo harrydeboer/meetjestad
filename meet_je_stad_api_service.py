@@ -7,6 +7,24 @@ import csv
 
 class MeetJeStadAPIService:
 
+    def __init__(self):
+        self.row_keys = [
+            'timestamp',
+            'id',
+            'row',
+            'temperature',
+            'longitude',
+            'latitude',
+            'humidity',
+            'supply',
+            'battery',
+            'firmware_version',
+            'pm2.5',
+            'pm10',
+            'lux',
+            'extra'
+        ]
+
     def get_data(self,
                  begin: str,
                  end: str,
@@ -61,95 +79,39 @@ class MeetJeStadAPIService:
             raise Exception(response.reason)
 
         # read from JSON
-        dates = []
-        ids = []
-        temps = []
-        longitude = []
-        latitude = []
-        humidity = []
-        supply = []
-        battery = []
-        firmware_version = []
-        pm25 = []
-        pm10 = []
-        lux = []
-        extra = []
+        results = []
         for row in response.json():
-            dates.append(row['timestamp'])
-            ids.append(row['id'])
-            if 'temperature' in row:
-                temps.append(row['temperature'])
-            else:
-                temps.append(None)
-            if 'longitude' in row:
-                longitude.append(row['longitude'])
-            else:
-                longitude.append(None)
-            if 'latitude' in row:
-                latitude.append(row['latitude'])
-            else:
-                latitude.append(None)
-            if 'humidity' in row:
-                humidity.append(row['humidity'])
-            else:
-                humidity.append(None)
-            if 'supply' in row:
-                supply.append(row['supply'])
-            else:
-                supply.append(None)
-            if 'battery' in row:
-                battery.append(row['battery'])
-            else:
-                battery.append(None)
-            if 'firmware_version' in row:
-                firmware_version.append(row['firmware_version'])
-            else:
-                firmware_version.append(None)
-            if 'pm2.5' in row:
-                pm25.append(row['pm2.5'])
-            else:
-                pm25.append(None)
-            if 'pm10' in row:
-                pm10.append(row['pm10'])
-            else:
-                pm10.append(None)
-            if 'lux' in row:
-                lux.append(row['lux'])
-            else:
-                lux.append(None)
-            if 'extra' in row:
-                extra.append(row['extra'])
-            else:
-                extra.append(None)
+            result = []
             for key in row:
-                if (key != 'timestamp' and key != 'id' and key != 'row' and key != 'temperature' and key != 'humidity'
-                        and key != 'longitude' and key != 'latitude' and key != 'supply' and key != 'battery'
-                        and key != 'firmware_version' and key != 'pm2.5' and key != 'pm10' and key != 'lux'
-                        and key != 'extra'):
+                if key not in self.row_keys:
                     raise Exception('Invalid key ' + key + ' in row.')
+            for key in self.row_keys:
+                if key == 'row':
+                    continue
+                if key in row:
+                    result.append(row[key])
+                else:
+                    result.append(None)
+            results.append(result)
 
-        # bind lists and transpose
-        dates_list = list(zip(*(dates, ids, temps, longitude, latitude, humidity,
-                                supply, battery, firmware_version, pm25, pm10, lux, extra)))
+        results.reverse()
+        results.sort(key=lambda x: x[1])
 
-        dates_list.reverse()
-        dates_list.sort(key=lambda x: x[1])
-
-        dates_list = self._sanitize(dates_list)
+        results = self._sanitize(results)
 
         if format_output == 'csv':
             file = open(os.path.dirname(os.path.abspath(__file__)) + "/output/meetjestad/out.csv", "w", newline='')
-            csv.writer(file).writerows(dates_list)
+            csv.writer(file).writerows(results)
             file.close()
 
             return []
         else:
-            return dates_list
+            return results
 
-    def _sanitize(self, dates_list: list) -> list:
+    def _sanitize(self, results: list) -> list:
 
         result = []
-        for row in dates_list:
+        for row in results:
             row_return = list(row)
             if row[2] is not None:
                 if row[2] < -25 or row[2] > 70:
