@@ -135,8 +135,6 @@ class MeetJeStadAPIService:
         result = []
         for row in dates_list:
             row_return = list(row)
-            if row[1] == 724:
-                test = 1
             if row[2] is not None:
                 if row[2] < -25 or row[2] > 70:
                     row_return[2] = None
