@@ -72,6 +72,8 @@ class MeetJeStadAPIService:
         firmware_version = []
         pm25 = []
         pm10 = []
+        lux = []
+        extra = []
         for row in response.json():
             dates.append(row['timestamp'])
             ids.append(row['id'])
@@ -111,10 +113,24 @@ class MeetJeStadAPIService:
                 pm10.append(row['pm10'])
             else:
                 pm10.append(None)
+            if 'lux' in row:
+                lux.append(row['lux'])
+            else:
+                lux.append(None)
+            if 'extra' in row:
+                extra.append(row['extra'])
+            else:
+                extra.append(None)
+            for key in row:
+                if (key != 'timestamp' and key != 'id' and key != 'row' and key != 'temperature' and key != 'humidity'
+                        and key != 'longitude' and key != 'latitude' and key != 'supply' and key != 'battery'
+                        and key != 'firmware_version' and key != 'pm2.5' and key != 'pm10' and key != 'lux'
+                        and key != 'extra'):
+                    raise Exception('Invalid key ' + key + ' in row.')
 
         # bind lists and transpose
         dates_list = list(zip(*(dates, ids, temps, longitude, latitude, humidity,
-                                supply, battery, firmware_version, pm25, pm10)))
+                                supply, battery, firmware_version, pm25, pm10, lux, extra)))
 
         dates_list.reverse()
         dates_list.sort(key=lambda x: x[1])

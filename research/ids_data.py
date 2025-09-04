@@ -12,7 +12,7 @@ for id_sensor in range(1, last_sensor_id + 1):
     for year in range(2022, current_year + 1):
         # Including summer
         if year == current_year:
-            end_date = str(year) + '-08-31,23:59'
+            end_date = str(year) + '-08-31,21:59'
         else:
             end_date = str(year) + '-12-31,23:59'
         result = meet_je_stad_api_service.MeetJeStadAPIService().get_data(
