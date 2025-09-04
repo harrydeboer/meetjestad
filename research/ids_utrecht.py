@@ -16,7 +16,7 @@ with open(os.getcwd() + "/geocode.csv", newline='') as csv_file:
     for row in reader:
         items = []
         for item in row[0].split(','):
-            items.append(int(item.replace('"', '')))
+            items.append(int(item))
         chart.append(items)
     chart.reverse()
 
