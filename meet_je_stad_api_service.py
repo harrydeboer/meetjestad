@@ -1,6 +1,4 @@
 import os
-import sys
-
 import requests
 from typing import Literal
 import datetime

@@ -21,8 +21,6 @@ with open(os.getcwd() + "/geocode.csv", newline='') as csv_file:
 last_sensor_id = int(os.getenv('LAST_SENSOR_ID'))
 last_date = datetime.datetime.strptime((os.getenv('END_DATE')),"%Y-%m-%d,%H:%M:%S").strftime('%Y-%m-%d')
 for id_sensor in range(1, last_sensor_id + 1):
-    results = []
-for id_sensor in range(1, last_sensor_id + 1):
     latitudes = {}
     longitudes = {}
     utrecht = []

@@ -13,7 +13,6 @@ quarter = os.getenv('QUARTER')
 for id_sensor in range(1, last_sensor_id + 1):
     results = []
     for year in range(2022, end_year + 1):
-        # Including summer
         if year == end_year:
             if quarter == '1':
                 if year % 4 == 0 and (year % 100 != 0 or year % 400 == 0):
@@ -31,7 +30,7 @@ for id_sensor in range(1, last_sensor_id + 1):
         else:
             end_date = str(year) + '-12-31,23:59:59'
         result = meet_je_stad_api_service.MeetJeStadAPIService().get_data(
-            str(year) + '-01-01,00:00',
+            str(year) + '-01-01,0:00:00',
             end_date,
             'sensors',
             'json',
