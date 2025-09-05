@@ -100,7 +100,9 @@ class MeetJeStadAPIService:
         results = self._sanitize(results)
 
         if format_output == 'csv':
-            file = open(os.path.dirname(os.path.abspath(__file__)) + "/output/meetjestad/out.csv", "w", newline='')
+            path = os.path.dirname(os.path.abspath(__file__))
+            path.replace('\\vendor\\meetjestad', '')
+            file = open(path + "/output/meetjestad/out.csv", "w", newline='')
             csv.writer(file).writerows(results)
             file.close()
 

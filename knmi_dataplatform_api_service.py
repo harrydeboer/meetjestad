@@ -60,7 +60,9 @@ class KNMIDataplatformAPIService:
         date_temp = list(zip(*(dates, temps)))
 
         if format_output == 'csv':
-            with open(os.path.dirname(os.path.abspath(__file__)) + '/output/knmi/' + coll + '-' + t0 + '-' + t1  +
+            path = os.path.dirname(os.path.abspath(__file__))
+            path.replace('\\vendor\\meetjestad', '')
+            with open(path + '/output/knmi/' + coll + '-' + t0 + '-' + t1  +
                       '.csv', 'w', newline='') as my_file:
                 wr = csv.writer(my_file)
                 for row in date_temp:
