@@ -36,8 +36,8 @@ class MeetJeStadAPIService:
                  limit: int = 100,
                  is_active_only: bool = True) -> list:
 
-        date_begin = datetime.datetime.strptime(begin, "%Y-%m-%d,%H:%M")
-        date_end = datetime.datetime.strptime(end, "%Y-%m-%d,%H:%M")
+        date_begin = datetime.datetime.strptime(begin, "%Y-%m-%d,%H:%M:%S")
+        date_end = datetime.datetime.strptime(end, "%Y-%m-%d,%H:%M:%S")
         if date_end < date_begin:
             raise Exception('t1 must be later than t0.')
 
@@ -71,8 +71,8 @@ class MeetJeStadAPIService:
                         raise Exception('Invalid IDs')
 
         uri = 'https://meetjestad.net/data/?type='
-        uri += (type_api + '&ids=' + ids + '&begin=' + date_begin.strftime('%Y-%m-%d,%H:%M') + '&end=' +
-                date_end.strftime('%Y-%m-%d,%H:%M') + '&format=json&limit=' + str(limit))
+        uri += (type_api + '&ids=' + ids + '&begin=' + date_begin.strftime('%Y-%m-%d,%H:%M:%S') + '&end=' +
+                date_end.strftime('%Y-%m-%d,%H:%M:%S') + '&format=json&limit=' + str(limit))
 
         response = requests.get(uri)
 
