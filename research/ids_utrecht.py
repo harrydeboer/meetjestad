@@ -2,14 +2,12 @@ import csv
 import datetime
 import math
 import os
+from dotenv import load_dotenv
+from research.utrecht_rectangle import UtrechtRectangle
 
-# Utrecht rectangle
-lat_s = 52.03
-lat_n = 52.14
-long_w = 4.98
-long_e = 5.19
 
-step = 500
+rectangle = UtrechtRectangle()
+load_dotenv()
 chart = []
 with open(os.getcwd() + "/geocode.csv", newline='') as csv_file:
     reader = csv.reader(csv_file, delimiter=' ', quotechar='|')
@@ -20,8 +18,10 @@ with open(os.getcwd() + "/geocode.csv", newline='') as csv_file:
         chart.append(items)
     chart.reverse()
 
-last_sensor_id = 1100
-last_date = '2025-08-31'
+last_sensor_id = int(os.getenv('LAST_SENSOR_ID'))
+last_date = datetime.datetime.strptime((os.getenv('END_DATE')),"%Y-%m-%d,%H:%M").strftime('%Y-%m-%d')
+for id_sensor in range(1, last_sensor_id + 1):
+    results = []
 for id_sensor in range(1, last_sensor_id + 1):
     latitudes = {}
     longitudes = {}
@@ -71,11 +71,11 @@ for id_sensor in range(1, last_sensor_id + 1):
         longitude = longitudes[key]
         utrecht_row = [key]
         end_date_utrecht = key
-        if long_e > longitude > long_w and lat_n > latitude > lat_s:
-            north = math.ceil((latitude - lat_s) * step)
-            south = math.floor((latitude - lat_s) * step)
-            east = math.ceil((longitude - long_w) * step)
-            west = math.floor((longitude - long_w) * step)
+        if rectangle.long_e > longitude > rectangle.long_w and rectangle.lat_n > latitude > rectangle.lat_s:
+            north = math.ceil((latitude - rectangle.lat_s) * rectangle.step_inverse)
+            south = math.floor((latitude - rectangle.lat_s) * rectangle.step_inverse)
+            east = math.ceil((longitude - rectangle.long_w) * rectangle.step_inverse)
+            west = math.floor((longitude - rectangle.long_w) * rectangle.step_inverse)
             chart_sw = chart[south][west]
             chart_se = chart[south][east]
             chart_nw = chart[north][west]
