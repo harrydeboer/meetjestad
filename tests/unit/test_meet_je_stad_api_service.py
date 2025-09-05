@@ -17,4 +17,10 @@ class TestMeetJeStadAPIService(unittest.TestCase):
                                   'sensors',
                                   'json',
                                   '1085')
-        self.assertEqual(len(result[0]), len(service.row_keys) - 1)
+        self.assertEqual(len(result[0]), len(service.row_keys))
+
+        result = service.get_data('2025-01-01,0:00',
+                                  '2025-06-30,23:59',
+                                  'sensors',
+                                  'json')
+        self.assertEqual(len(result[0]), len(service.row_keys))

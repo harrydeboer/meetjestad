@@ -11,7 +11,7 @@ class UnitTestLauncher(object):
         ls_paths = []
 
         # Find all relevant subdirectories that contain tests.
-        for path, subdirs, files in os.walk('tests'):
+        for path, subdirectories, files in os.walk('tests'):
             if "pycache" not in path and path != 'tests':
                 ls_paths.append(path)
 

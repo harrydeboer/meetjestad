@@ -24,7 +24,7 @@ for id_sensor in range(1, last_sensor_id + 1):
         False,
         40000)
 
-        if result != []:
+        if result != list():
             for row in result:
                 results.append(list(row))
 

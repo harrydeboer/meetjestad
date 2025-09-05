@@ -11,7 +11,6 @@ class MeetJeStadAPIService:
         self.row_keys = [
             'timestamp',
             'id',
-            'row',
             'temperature',
             'longitude',
             'latitude',
@@ -83,11 +82,9 @@ class MeetJeStadAPIService:
         for row in response.json():
             result = []
             for key in row:
-                if key not in self.row_keys:
-                    raise Exception('Invalid key ' + key + ' in row.')
+                if key not in self.row_keys and key != 'row':
+                    print('Invalid key ' + key + ' in row.')
             for key in self.row_keys:
-                if key == 'row':
-                    continue
                 if key in row:
                     result.append(row[key])
                 else:
@@ -95,7 +92,10 @@ class MeetJeStadAPIService:
             results.append(result)
 
         results.reverse()
-        results.sort(key=lambda x: x[1])
+        for key, value in enumerate(self.row_keys):
+            if value == 'id':
+                break
+        results.sort(key=lambda x: x[key])
 
         results = self._sanitize(results)
 
@@ -108,20 +108,20 @@ class MeetJeStadAPIService:
         else:
             return results
 
-    def _sanitize(self, results: list) -> list:
+    def _sanitize(self, raw_results: list) -> list:
 
-        result = []
-        for row in results:
-            row_return = list(row)
-            if row[2] is not None:
-                if row[2] < -25 or row[2] > 70:
-                    row_return[2] = None
-            if row[9] is not None:
-                if row[9] < 0 or row[9] > 250:
-                    row_return[9] = None
-            if row[10] is not None:
-                if row[10] < 0 or row[10] > 250:
-                    row_return[10] = None
-            result += [row_return]
+        results = []
+        for raw_row in raw_results:
+            row = list(raw_row)
+            if raw_row[2] is not None:
+                if raw_row[2] < -25 or raw_row[2] > 70:
+                    row[2] = None
+            if raw_row[9] is not None:
+                if raw_row[9] < 0 or raw_row[9] > 250:
+                    row[9] = None
+            if raw_row[10] is not None:
+                if raw_row[10] < 0 or raw_row[10] > 250:
+                    row[10] = None
+            results += [row]
 
-        return result
+        return results
