@@ -61,7 +61,10 @@ class KNMIDataplatformAPIService:
 
         if format_output == 'csv':
             path = os.path.dirname(os.path.abspath(__file__))
-            path = path.replace('\\vendor\\meetjestad', '')
+            parent_path = os.path.dirname(path)
+            grandparent_path = os.path.dirname(parent_path)
+            if parent_path.endswith('vendor'):
+                path = grandparent_path
             with open(path + '/output/knmi/' + coll + '-' + t0 + '-' + t1  +
                       '.csv', 'w', newline='') as my_file:
                 wr = csv.writer(my_file)

@@ -1,4 +1,6 @@
 import os
+import sys
+
 import requests
 from typing import Literal
 import datetime
@@ -101,7 +103,10 @@ class MeetJeStadAPIService:
 
         if format_output == 'csv':
             path = os.path.dirname(os.path.abspath(__file__))
-            path = path.replace('\\vendor\\meetjestad', '')
+            parent_path = os.path.dirname(path)
+            grandparent_path = os.path.dirname(parent_path)
+            if parent_path.endswith('vendor'):
+                path = grandparent_path
             file = open(path + "/output/meetjestad/out.csv", "w", newline='')
             csv.writer(file).writerows(results)
             file.close()
